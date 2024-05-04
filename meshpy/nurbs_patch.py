@@ -85,6 +85,16 @@ class NURBSPatch(Element):
             )
         return n_knots
 
+    def get_number_of_control_points_per_dir(self):
+        """Return the number of control points in each parameter direction of the patch"""
+        n_dim = len(self.knot_vectors)
+        n_cp_per_dim = []
+        for i_dim in range(n_dim):
+            knot_vector_size = len(self.knot_vectors[i_dim])
+            polynomial_order = self.polynomial_orders[i_dim]
+            n_cp_per_dim.append(knot_vector_size - polynomial_order - 1)
+        return n_cp_per_dim
+
     def add_element_specific_section(self, sections):
         """Return additional information of the NURBS patch"""
 

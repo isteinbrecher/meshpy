@@ -192,19 +192,6 @@ def create_geometry_sets(element):
     return item, look into add_geomdl_nurbs_to_mesh.
     """
 
-    def get_num_cps_uvw(knot_vectors):
-        """Obtain the number of control points on each parametric direction of a patch"""
-        num_cps_uvw = np.zeros(len(knot_vectors), dtype=int)
-
-        for direction in range(len(knot_vectors)):
-            knotvector_size_dir = len(element.knot_vectors[direction])
-            p_dir = element.polynomial_orders[direction]
-            cp_size_dir = knotvector_size_dir - p_dir - 1
-
-            num_cps_uvw[direction] = cp_size_dir
-
-        return num_cps_uvw
-
     def get_patch_vertices(return_set, num_cps_uvw, nurbs_dimension, element):
         """Get the control points positioned over the vertices of a patch"""
 
@@ -582,7 +569,7 @@ def create_geometry_sets(element):
     return_set = GeometryName()
 
     # Get the number of control points on each parametric direction that define the patch
-    num_cps_uvw = get_num_cps_uvw(element.knot_vectors)
+    num_cps_uvw = element.get_number_of_control_points_per_dir()
 
     # Get the NURBS dimension
     nurbs_dimension = len(element.knot_vectors)
