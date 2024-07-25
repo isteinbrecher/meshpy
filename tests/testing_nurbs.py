@@ -36,6 +36,7 @@ This script is used to test the mesh creation functions for NURBS.
 import unittest
 import numpy as np
 import os
+import splinepy
 
 # Meshpy imports
 from meshpy import (
@@ -48,6 +49,7 @@ from meshpy import (
 # Geometry functions
 from meshpy.mesh_creation_functions import (
     add_geomdl_nurbs_to_mesh,
+    add_splinepy_nurbs_to_mesh,
     create_nurbs_hollow_cylinder_segment_2d,
     create_nurbs_flat_plate_2d,
     create_nurbs_brick,
@@ -95,7 +97,7 @@ class TestNurbsMeshCreationFunction(unittest.TestCase):
         # Compare with the reference file
         compare_test_result(self, input_file.get_string(header=False))
 
-    def test_nurbs_flat_plate_2d(self):
+    def test_nurbs_flat_plate_2d_geomdl(self):
         """Test the creation of a two dimensional flat plate"""
 
         # Create the surface of a flat plate
@@ -122,7 +124,53 @@ class TestNurbsMeshCreationFunction(unittest.TestCase):
         input_file.add(patch_set)
 
         # Compare with the reference file
-        compare_test_result(self, input_file.get_string(header=False))
+        compare_test_result(
+            self,
+            input_file.get_string(header=False),
+            reference_file_name="test_nurbs_flat_plate_2d",
+        )
+
+    def test_nurbs_flat_plate_2d_splinepy(self):
+        """Test the creation of a two dimensional flat plate with splinepy"""
+
+        # Create the surface of a flat plate
+        n_ele_u = 2
+        n_ele_v = 5
+        surf_obj = splinepy.helpme.create.box(0.75, 0.91).nurbs
+        surf_obj.elevate_degrees([0, 1])
+        surf_obj.insert_knots(0, np.linspace(0, 1, n_ele_u + 1))
+        surf_obj.insert_knots(1, np.linspace(0, 1, n_ele_v + 1))
+
+        control_points_3d = np.zeros([len(surf_obj.control_points), 3])
+        control_points_3d[:, :2] = surf_obj.control_points
+        surf_obj.control_points = control_points_3d - 0.5 * np.array([0.75, 0.91, 0])
+
+        # Create input file
+        input_file = InputFile()
+
+        # Add material
+        mat = MaterialStVenantKirchhoff(youngs_modulus=710, nu=0.19, density=5.3e-7)
+
+        # Create patch set
+        element_description = (
+            "KINEM linear EAS none THICK 1.0 STRESS_STRAIN plane_strain GP 3 3"
+        )
+
+        patch_set = add_splinepy_nurbs_to_mesh(
+            input_file,
+            surf_obj,
+            material=mat,
+            element_description=element_description,
+        )
+
+        input_file.add(patch_set)
+
+        # Compare with the reference file
+        compare_test_result(
+            self,
+            input_file.get_string(header=False),
+            reference_file_name="test_nurbs_flat_plate_2d",
+        )
 
     def test_nurbs_brick(self):
         """Test the creation of a brick"""

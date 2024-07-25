@@ -110,9 +110,10 @@ class NURBSPatch(Element):
         section.add("BEGIN NURBSPATCH")
         section.add(f"ID {self.n_nurbs_patch}")
 
-        for dir_manifold in range(len(self.knot_vectors)):
-            num_knotvectors = len(self.knot_vectors[dir_manifold])
-            section.add(f"NUMKNOTS {num_knotvectors}")
+        for dir_manifold in range(self.get_nurbs_dimension()):
+            knotvector = self.knot_vectors[dir_manifold]
+            num_knots = len(knotvector)
+            section.add(f"NUMKNOTS {num_knots}")
             section.add(f"DEGREE {self.polynomial_orders[dir_manifold]}")
 
             # Check the type of knot vector, in case that the multiplicity of the first and last
@@ -121,17 +122,8 @@ class NURBSPatch(Element):
             knotvector_type = "Interpolated"
 
             for i in range(self.polynomial_orders[dir_manifold] - 1):
-                if (
-                    abs(
-                        self.knot_vectors[dir_manifold][i]
-                        - self.knot_vectors[dir_manifold][i + 1]
-                    )
-                    > mpy.eps_knot_vector
-                ) or (
-                    abs(
-                        self.knot_vectors[dir_manifold][num_knotvectors - 2 - i]
-                        - self.knot_vectors[dir_manifold][num_knotvectors - 1 - i]
-                    )
+                if (abs(knotvector[i] - knotvector[i + 1]) > mpy.eps_knot_vector) or (
+                    abs(knotvector[num_knots - 2 - i] - knotvector[num_knots - 1 - i])
                     > mpy.eps_knot_vector
                 ):
                     knotvector_type = "Periodic"
@@ -139,7 +131,7 @@ class NURBSPatch(Element):
 
             section.add(f"TYPE {knotvector_type}")
 
-            for knot_vector_val in self.knot_vectors[dir_manifold]:
+            for knot_vector_val in knotvector:
                 section.add(f"{knot_vector_val}")
 
         section.add("END NURBSPATCH")

@@ -63,7 +63,7 @@ from .beam_stent import create_beam_mesh_stent
 from .beam_wire import create_wire_fibers
 
 # Generic NURBS mesh creation function
-from .nurbs_generic import add_geomdl_nurbs_to_mesh
+from .nurbs_generic import add_geomdl_nurbs_to_mesh, add_splinepy_nurbs_to_mesh
 
 # NURBS geometry functions
 from .nurbs_geometries import (
