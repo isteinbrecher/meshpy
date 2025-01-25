@@ -49,4 +49,4 @@ RUN ls -l
 ENV PATH="/home/ubuntu/meshpy-env/bin:$PATH"
 RUN pip install -e .
 RUN pip install --no-cache-dir notebook jupyterlab jupyterhub tame
-# pyvista[jupyter]pip install trame ipywidgets # seems like this is also missing - but does not fix everything
+RUN pip install pyvista[jupyter] trame ipywidgets
