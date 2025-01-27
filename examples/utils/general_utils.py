@@ -30,9 +30,8 @@ from meshpy.utils.environment import is_mybinder
 # Store the default system out, so we can reset it after pyvista changes it
 stdout = sys.stdout
 
-# If we are on mybinder, set to server side rendering
-if is_mybinder():
-    pv.start_xvfb()
+# Per default we use client side rendering
+pv.set_jupyter_backend("trame")
 
 
 def reset_print_out():

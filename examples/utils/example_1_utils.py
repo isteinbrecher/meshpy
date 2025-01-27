@@ -23,6 +23,7 @@
 
 import numpy as np
 import pyvista as pv
+from matplotlib.colors import ListedColormap
 
 from meshpy.utils.environment import is_testing
 
@@ -69,10 +70,19 @@ def add_cube_plot(plotter, row, col, rotation, text, *, plot_outlines=True):
             [255, 255, 255],
         ]
     )
-    cube.cell_data["colors"] = face_colors
+    face_colors_normalized = face_colors / 255.0
+
+    # Assign scalar values to each face (0, 1, 2, ...)
+    face_scalars = np.arange(len(face_colors))
+    cube.cell_data["colors"] = face_scalars
+
+    # Create a custom colormap using Matplotlib
+    cmap = ListedColormap(face_colors_normalized)
 
     # Plot the cube and the title text
-    plotter.add_mesh(cube, scalars="colors", show_edges=True, rgb=True)
+    plotter.add_mesh(
+        cube, scalars="colors", show_edges=True, cmap=cmap, show_scalar_bar=False
+    )
     plotter.add_text(text, font_size=12)
 
     # Plot the axes
