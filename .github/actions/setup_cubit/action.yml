@@ -4,6 +4,12 @@ inputs:
   cubit_download_url:
     description: URL where Cubit can be downloaded from
     required: true
+  cubit_email:
+    description: Email to activate cubit
+    required: true
+  cubit_password:
+    description: Password to activate cubit
+    required: true
 runs:
   using: composite
   steps:

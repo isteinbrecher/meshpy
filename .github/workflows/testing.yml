@@ -45,7 +45,7 @@ jobs:
           path: ${{ env.PYTEST_TMPDIR }}
 
   meshpy-testing-all-dependencies:
-    name: ubuntu-latest with all dependencies, i.e., 4C, ArborX and Cubit
+    name: ubuntu-latest with all dependencies
     if: github.event_name != 'pull_request_target' || github.event.pull_request.head.ref != 'ci-testing'
     runs-on: ubuntu-latest
     container:
@@ -64,6 +64,8 @@ jobs:
         uses: ./.github/actions/setup_cubit
         with:
           cubit_download_url: https://f002.backblazeb2.com/file/cubit-downloads/Coreform-Cubit/Releases/Linux/Coreform-Cubit-2025.3%2B58709-Lin64.tar.gz
+          cubit_email: ${{ secrets.CUBIT_EMAIL }}
+          cubit_password: ${{ secrets.CUBIT_PASSWORD }}
       - name: Setup virtual python environment
         uses: ./.github/actions/setup_virtual_python_environment
       - name: Build ArborX geometric search
