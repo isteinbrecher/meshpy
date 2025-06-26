@@ -4,15 +4,10 @@ on:
   schedule:
     - cron: '0 04 * * *'
   push:
-    branches:
-      - main
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
+    branches: [main, ci-testing]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
-    type: choice
 
 jobs:
   meshpy-testing:
@@ -49,34 +44,9 @@ jobs:
           name: ${{github.job}}-${{ matrix.os-version }}-python${{ matrix.python-version }}-${{github.run_number}}
           path: ${{ env.PYTEST_TMPDIR }}
 
-  meshpy-testing-cubitpy:
-    name: self-hosted with CubitPy
-    runs-on: self-hosted
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Setup virtual python environment
-        uses: ./.github/actions/setup_virtual_python_environment
-        with:
-          python-exe: /home_local/github-runner/testing_lib/spack/opt/spack/linux-ubuntu20.04-icelake/gcc-9.4.0/python-3.12.1-qnjucxirxh534suwewl6drfa237u6t7w/bin/python
-      - name: Run the test suite
-        uses: ./.github/actions/run_tests
-        with:
-          install-command: ".[cubitpy,dev,fourc]"
-          source-command: "source python-workflow-venv/bin/activate"
-          additional-pytest-flags: "--CubitPy --no-cov"
-      - name: Upload test results on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{github.job}}-${{github.run_number}}
-          path: ${{ env.PYTEST_TMPDIR }}
-
-  meshpy-testing-4C-arborx:
-    name: ubuntu-latest with 4C and ArborX
+  meshpy-testing-all-dependencies:
+    name: ubuntu-latest with all dependencies, i.e., 4C, ArborX and Cubit
+    if: github.event_name != 'pull_request_target' || github.event.pull_request.head.ref != 'ci-testing'
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/4c-multiphysics/4c:main
@@ -112,30 +82,3 @@ jobs:
           path: ${{ env.PYTEST_TMPDIR }}
       - name: Coverage badge and report
         uses: ./.github/actions/coverage
-
-  meshpy-performance-testing:
-    name: performance tests
-    runs-on: self-hosted
-    continue-on-error: true
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Setup virtual python environment
-        uses: ./.github/actions/setup_virtual_python_environment
-        with:
-          python-exe: /home_local/github-runner/testing_lib/spack/opt/spack/linux-ubuntu20.04-icelake/gcc-9.4.0/python-3.12.1-qnjucxirxh534suwewl6drfa237u6t7w/bin/python
-      - name: Run the test suite
-        uses: ./.github/actions/run_tests
-        with:
-          install-command: ".[cubitpy,dev,fourc]"
-          source-command: "source python-workflow-venv/bin/activate"
-          additional-pytest-flags: "--performance-tests --exclude-standard-tests -s --no-cov"
-      - name: Upload test results on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{github.job}}-${{github.run_number}}
-          path: ${{ env.PYTEST_TMPDIR }}
