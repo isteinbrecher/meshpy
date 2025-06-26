@@ -59,6 +59,7 @@ jobs:
         with:
           submodules: true
       - name: Setup cubit
+        id: cubit
         uses: ./.github/actions/setup_cubit
         with:
           cubit_download_url: https://f002.backblazeb2.com/file/cubit-downloads/Coreform-Cubit/Releases/Linux/Coreform-Cubit-2025.3%2B58709-Lin64.tar.gz
@@ -74,6 +75,7 @@ jobs:
           source-command: "source python-workflow-venv/bin/activate"
           install-command: "-e .[cubitpy,dev,fourc]"
           additional-pytest-flags: "--4C --ArborX --CubitPy --performance-tests --cov-fail-under=93"
+          cubit-root: ${{ steps.cubit.outputs.cubit_root }}
       - name: Upload test results on failure
         if: failure()
         uses: actions/upload-artifact@v4

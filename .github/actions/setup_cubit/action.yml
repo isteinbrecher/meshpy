@@ -10,10 +10,15 @@ inputs:
   cubit_password:
     description: Password to activate cubit
     required: true
+outputs:
+  cubit_root:
+    description: "Path to the Cubit installation"
+    value: ${{ steps.setup-cubit.outputs.cubit_root }}
 runs:
   using: composite
   steps:
     - name: Download and unpack Cubit
+      id: setup-cubit
       shell: bash
       run: |
         # We need these packages for cubit to work
@@ -25,8 +30,8 @@ runs:
         tar -xzf *.tar.gz
         # Save cubit root path for following steps
         CUBIT_FOLDER=$(find . -maxdepth 1 -type d -name "Coreform-Cubit-*" | head -n 1 | sed 's|^\./||')
-        export CUBIT_ROOT="$(pwd)/$CUBIT_FOLDER"
-        echo "CUBIT_ROOT=$CUBIT_ROOT" >> "$GITHUB_ENV"
+        CUBIT_ROOT="$(pwd)/$CUBIT_FOLDER"
+        echo "cubit_root=$CUBIT_ROOT" >> "$GITHUB_OUTPUT"
         # Check if secrets are available
         if [[ -z "${{ inputs.cubit_password }}" ]]; then
           echo "cubit_password is empty or not injected"
