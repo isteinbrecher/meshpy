@@ -28,8 +28,8 @@ runs:
         export CUBIT_ROOT="$(pwd)/$CUBIT_FOLDER"
         echo "CUBIT_ROOT=$CUBIT_ROOT" >> "$GITHUB_ENV"
         # Check if secrets are available
-        if [[ -z "$CUBIT_PASSWORD" ]]; then
-          echo "CUBIT_PASSWORD is empty or not injected"
+        if [[ -z "${{ inputs.cubit_password }}" ]]; then
+          echo "cubit_password is empty or not injected"
           exit 1
         fi
         # Activate cubit
