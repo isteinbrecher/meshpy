@@ -50,8 +50,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/4c-multiphysics/4c:main
-    env:
-      CUBIT_ROOT: ${GITHUB_WORKSPACE}/Coreform-Cubit-2025.3
     defaults:
       run:
         shell: bash

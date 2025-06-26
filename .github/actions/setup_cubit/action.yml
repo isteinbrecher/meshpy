@@ -21,7 +21,7 @@ runs:
         sudo apt install -y libglu1-mesa
         # Download cubit and extract it
         cd ${GITHUB_WORKSPACE}
-        wget -q https://f002.backblazeb2.com/file/cubit-downloads/Coreform-Cubit/Releases/Linux/Coreform-Cubit-2025.3%2B58709-Lin64.tar.gz
+        wget -q ${{ inputs.cubit_download_url }}
         tar -xzf *.tar.gz
         # Save cubit root path for following steps
         CUBIT_FOLDER=$(find . -maxdepth 1 -type d -name "Coreform-Cubit-*" | head -n 1 | sed 's|^\./||')
@@ -33,7 +33,4 @@ runs:
           exit 1
         fi
         # Activate cubit
-        $CUBIT_ROOT/bin/rlm_activate --login $CUBIT_EMAIL $CUBIT_PASSWORD
-      env:
-        CUBIT_EMAIL: ${{ secrets.CUBIT_EMAIL }}
-        CUBIT_PASSWORD: ${{ secrets.CUBIT_PASSWORD }}
+        $CUBIT_ROOT/bin/rlm_activate --login ${{ inputs.cubit_email }} ${{ inputs.cubit_password }}
